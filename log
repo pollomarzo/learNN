@@ -1,0 +1,32 @@
+
+18-02-2020
+    anaconda (py interpreter with scipy matplotlib)
+        -> installed in /home/paolo/.anaconda3
+        -> scipy, matplotlip, pip
+    changed backend keras to theano in /home/.keras/keras.json
+    learned how to import csv
+    plt.imshow(np.reshape(newdata[1],[28,28])), plt.show()
+    Flatten() layer if outputs dont match labels
+    train-test split
+    0.958 accuracy 1 epoch (but 0.92 on training)
+    the reshape is useless but lets me see the images
+
+19-02-2020
+    found mistake! for theano, keras.json->image_data_format is channels_first,
+    while for tensorflow it should be channels_last! maybe that's why yesterday
+    was having problems? will test. 
+    turns out, i did make a mistake but the problem wasn't due to that. fixed now
+    0.974 accuracy 1 epoch
+    learned convolution and pooling (pooling is kinda trash, but understand)
+    started watching 6.S191
+    
+tmrw:
+    sequential data and recurrent networks
+    LSTM
+    lstm in computer vision
+    generative networks
+    meaning of epochs
+    visualizing accuracy evolution
+
+20-02-2020
+    
