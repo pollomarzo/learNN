@@ -1,5 +1,5 @@
 
-18-02-2020
+17-02-2020
     data: https://www.kaggle.com/c/digit-recognizer/data
     anaconda (py interpreter with scipy matplotlib)
         -> installed in /home/paolo/.anaconda3
@@ -12,14 +12,12 @@
     0.958 accuracy 1 epoch (but 0.92 on training)
     the reshape is useless but lets me see the images
 
-19-02-2020
+18-02-2020
     data: https://www.kaggle.com/c/digit-recognizer/data
-    found mistake! for theano, keras.json->image_data_format is channels_first,
-    while for tensorflow it should be channels_last! maybe that's why yesterday
-    was having problems? will test. 
-    turns out, i did make a mistake but the problem wasn't due to that. fixed now
+    found mistake! for theano, keras.json->image_data_format is channels_first, while for tensorflow it should be channels_last! maybe that's why yesterday I was having problems? will test.  turns out, i did make a mistake but the problem wasn't due to that. fixed now
     0.974 accuracy 1 epoch
     learned convolution and pooling (pooling is kinda trash, but understand)
+    correction: pooling is smart. whish there was a better way to generalize on traslation...
     started watching 6.S191
     
 tmrw:
@@ -29,8 +27,22 @@ tmrw:
     generative networks
     meaning of epochs
     visualizing accuracy evolution
+    implementing normal and recurrent networks manually
+    attention/augmented RNNs https://distill.pub/2016/augmented-rnns/
 
-20-02-2020
+19-02-2020
     created git repo
+    started reading http://karpathy.github.io/2015/05/21/rnn-effectiveness/
+        doesnt explain LSTM. will find different source in future
+        https://github.com/kjw0612/awesome-rnn
+        uses lua/torch. will keep reading, but focus on keras for one more model, then tensorflow, then maybe pytorch
+        truncated backprop:     "Truncated backpropagation is arguably the most practical method for training RNNs.… One of the main problems of BPTT is the high cost of a single parameter update, which makes it impossible to use a large number of iterations.…The cost can be reduced with a naive method that splits the 1,000-long sequence into 50 sequences (say) each of length 20 and treats each sequence of length 20 as a separate training case. This is a sensible approach that can work well in practice, but it is blind to temporal dependencies that span more than 20 timesteps.…    Truncated BPTT is a closely related method. It processes the sequence one timestep at a time, and every k1 timesteps, it runs BPTT for k2 timesteps, so a parameter update can be cheap if k2 is small. Consequently, its hidden states have been exposed to many timesteps and so may contain useful information about the far past, which would be opportunistically exploited." from http://www.cs.utoronto.ca/~ilya/pubs/ilya_sutskever_phd_thesis.pdf  may be useful again in future.
+    Read about capsule neural networks
+        https://arxiv.org/abs/1710.09829 main paper
+        https://github.com/naturomics/CapsNet-Tensorflow tensorflow implementation
+        basic gist: a capsule is a group of neurons, and it produces an activity vector. its length is the probability the entity it represents exists, and its orientation represents the instantiation parameters (this is supposedly a better way to generalize on trasformations than pooling). When many capsules agree on existence, higher level capsule becomes active, but a lower level sends to a higher level with highest scalar product between prediction (from lower level) and activity vector (higher level). doesnt this correlate stuff? This is too complex, no point wasting too much time. may come back in the future.
+    http://colah.github.io/posts/2015-08-Understanding-LSTMs/ LSTM theory. very clear and simple
+    fixed dates. apparently i got the date wrong TWO days in a row...
+    while putting together LSTM model found out Keras with Theano cannot set dropout in LSTM layers. will now switch to tensorflow
     
     
