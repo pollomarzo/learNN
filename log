@@ -19,16 +19,6 @@
     learned convolution and pooling (pooling is kinda trash, but understand)
     correction: pooling is smart. whish there was a better way to generalize on traslation...
     started watching 6.S191
-    
-tmrw:
-    sequential data and recurrent networks
-    LSTM
-    lstm in computer vision (?)
-    generative networks
-    meaning of epochs
-    visualizing accuracy evolution
-    implementing normal and recurrent networks manually
-    attention/augmented RNNs https://distill.pub/2016/augmented-rnns/
 
 19-02-2020
     created git repo
@@ -45,4 +35,43 @@ tmrw:
     fixed dates. apparently i got the date wrong TWO days in a row...
     while putting together LSTM model found out Keras with Theano cannot set dropout in LSTM layers. will now switch to tensorflow
     
+tmrw:
+    sequential data and recurrent networks
+    LSTM
+    lstm in computer vision (?)
+    generative networks
+    meaning of epochs
+    visualizing accuracy evolution
+    implementing normal and recurrent networks manually
+    attention/augmented RNNs https://distill.pub/2016/augmented-rnns/
+    reinforcement learning
+    scikit-learn (?)
     
+20-02-2020
+    let's start looking at tensorflow. will re-do the three projects completed so far, in tf
+    tf.keras == keras with tf. will skip this?
+    i'll start by running tensorflow on Docker to use GPU
+
+21-02-2020
+    apparently wasn't as easy as i thought. done now. changed video drivers, used precompiled binaries from AUR, CUDA 10.1 is the one i can use (correction: changed driver series, should check on CUDA website) (but dont, as docker does not need cuda installed in host system), will save a couple useful commands
+
+22-02-2020
+    - docker run --name tftrial --gpus all -it -v ~/Documents/studies/intro/:/tmp -w /tmp --rm tensorflow/tensorflow:latest-gpu bash 
+    this opens a new container with name tftrial, with gpu "privileges", mounts directory ~/D/s/i, changes working directory of container to /tmp, with the tensorflow-gpu image and opens bash. to get out, Ctrl+p - Ctrl+q will now turn interactive mode into daemon mode (if:
+    was a TTY allocated (-t)
+    was stdin left open (-i).)
+    ofc, just because docker is the simpler option, it does not mean it is simple. read http://phusion.github.io/baseimage-docker/#intro for interesting info. i will keep using docker exec, as tensorflow wiki [https://www.tensorflow.org/install/docker] proposes it, altough [https://github.com/phusion/baseimage-docker#login_docker_exec].
+    - can avoid docker exec problems by running processes from inside bash: this way (i think) what i run is child of bash, and bash reaps it (pretty sure) but not sure if killing bash kills process. shouldnt need to know anyway.
+    this took forever. ill skim over tf.keras (there doesnt seem to be anything new) and next will be custom tensorflow.
+    
+23-02-2020
+    didn't write much, read a few articles, as [https://www.pyimagesearch.com/2018/10/08/keras-vs-tensorflow-which-one-is-better-and-which-one-should-i-learn/], maybe will get his book (got it, will try to skim in following days)
+    
+24-02-2020
+    little time. cleaned up a bit, got a couple books, realized that machine learning is divided in supervised/unsupervised/reinforcement. Now, very interested in reinforcement, but i think i should complete others first. so, in the next few days:
+    tensorflow "bare bones"
+    possibly manual implementation of something
+    re-study other data science techniques, maybe use R datasets
+    really wanna learn twitter sent analysis
+    a couple unsupervised techniques
+    reinforcement learning (really want to know what it's all about

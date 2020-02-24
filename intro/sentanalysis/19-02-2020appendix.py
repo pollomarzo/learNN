@@ -7,7 +7,7 @@ model = K.models.load_model("./models/sentanalysis.h5")
 model.summary()
 
 index = K.datasets.imdb.get_word_index()
-review = "this movie was interesting"
+review = "this movie was great"
 
 
 words = review.split()
