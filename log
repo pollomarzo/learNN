@@ -69,9 +69,20 @@ tmrw:
     
 24-02-2020
     little time. cleaned up a bit, got a couple books, realized that machine learning is divided in supervised/unsupervised/reinforcement. Now, very interested in reinforcement, but i think i should complete others first. so, in the next few days:
+    
     tensorflow "bare bones"
     possibly manual implementation of something
     re-study other data science techniques, maybe use R datasets
     really wanna learn twitter sent analysis
     a couple unsupervised techniques
-    reinforcement learning (really want to know what it's all about
+    reinforcement learning (really want to know what it's all about)
+
+26-02-2020
+    will go through other keras examples. Now i understand the power of using a high level API mixed with "lower" level Tensorflow for specific things (still have to see what those will be). PyTorch will be tough.
+    following https://keras.io/examples/addition_rnn/ faithfully to understand
+    I'm a little bit stumped on the RepeatVector. read this [https://machinelearningmastery.com/learn-add-numbers-seq2seq-recurrent-neural-networks/], but still not sure. i think im missing some info on RNN in general. from the article, when exploring MLPs instead of recurrent, "The issue is that we encoded so much of the domain into the problem that it turned the problem from a sequence prediction problem into a function mapping problem. That is, the order of the input no longer matters. We could shuffle it up any way we want and still learn the problem. MLPs are designed to learn mapping functions and can easily nail the problem of learning how to add numbers. On one hand, this is a better way to approach the specific problem of adding numbers because the model is simpler and the results are better. On the other, it is a terrible use of recurrent neural networks."
+    Read a bit more on encoder-decoder. i think i should hit pause on the implementation and get further with theory, but not sure yet.
+    "First, the input sequence is shown to the network one encoded character at a time. We need an encoding level to learn the relationship between the steps in the input sequence and develop an internal representation of these relationships. One or more LSTM layers can be used to implement the encoder model. The output of this model is a fixed-size vector that represents the internal representation of the input sequence. The number of memory cells in this layer defines the length of this fixed-sized vector.[...] As with the Vanilla LSTM, a Dense layer is used as the output for the network. The same weights can be used to output each time step in the output sequence by wrapping the Dense layer in a TimeDistributed wrapper."
+
+27-02-2020
+    completed yesterday's model, helped a friend learn.
