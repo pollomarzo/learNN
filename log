@@ -89,3 +89,7 @@ tmrw:
 
 12-04-2020
     been a while. wrote a complete model for fake news detection, with GloVe embedding, LSTM-CNN, and a beautiful misuse of Python to create java-looking implementation of a "full" handler class for the model. may update it in the future, just felt like it was time. actually spent a ton of time on this, about 12 hours total. had fun and learnt a lot! still, incomplete.
+    MAIN sources:
+        https://gist.github.com/JacopoMangiavacchi/7d6a8310e73af8f8f902f8dfa6204b04#file-createmodelwithgloveembedding-ipynb
+        https://github.com/pmsosa/CS291K/blob/925f38bb5a9a802cfc60f8cc439cb9f2548854af/lstm_cnn.py#L5
+    i HAVE to switch from full scripts to notebooks, it's getting silly. also, i forgot how to use docker to use gpu. not that it matters that much. next time ill set up gpu for normal python calls
