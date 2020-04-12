@@ -86,3 +86,6 @@ tmrw:
 
 27-02-2020
     completed yesterday's model, helped a friend learn.
+
+12-04-2020
+    been a while. wrote a complete model for fake news detection, with GloVe embedding, LSTM-CNN, and a beautiful misuse of Python to create java-looking implementation of a "full" handler class for the model. may update it in the future, just felt like it was time. actually spent a ton of time on this, about 12 hours total. had fun and learnt a lot! still, incomplete.
