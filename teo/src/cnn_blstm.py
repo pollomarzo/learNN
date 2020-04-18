@@ -40,7 +40,7 @@ class BlstmCnnUtility(ModelWrapper):
         self.model.add(K.layers.Embedding(len(self.tokenizer.word_index) + 1, embedding_size,
                                           input_length=self.sequence_length, weights=[
                                               embedding_matrix],
-                                          trainable=True))
+                                          trainable=TRAINABLE_GLOVE))
 
         # self.model.add(K.layers.Bidirectional(K.layers.LSTM(
         #   units=num_cells, dropout=0.4, recurrent_dropout=0.4,return_sequences=True)))

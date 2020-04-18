@@ -5,6 +5,7 @@ from tensorflow import keras as K
 import numpy as np
 import utils
 
+DONT_TRAIN_JUST_LOAD = False
 
 # both relative to the SCRIPT, to avoid workdir hassle
 DATA_DIR = '../data/train.csv'
@@ -27,6 +28,7 @@ CURRENT = os.path.dirname(__file__)
 FULL_DATA_DIR = os.path.join(CURRENT, DATA_DIR)
 FULL_GLOVE_DIR = os.path.join(CURRENT, GLOVE_DIR)
 
+# create clean file usign utils.clean_and_save if not present
 try:
     f = open(os.path.join(CURRENT, CLEAN_DATA_DIR))
 except FileNotFoundError:
@@ -41,13 +43,13 @@ except FileNotFoundError:
 
 
 data_train = pd.read_csv(os.path.join(CURRENT, CLEAN_DATA_DIR))
-x_train = [str(elem) for elem in data_train.data]
+x_train = [str(elem) for elem in data_train.data]  # necessary
 y_train = data_train.labels
 
 # initialize network
 handler = BlstmCnnUtility([x_train, y_train], SEQ_LEN, GLOVE=True,
                           glove_dir=FULL_GLOVE_DIR)
-if True:
+if not DONT_TRAIN_JUST_LOAD:
     # build model with specified convolution layers
     handler.build_model(EMBED_DIM, FILTER_SIZES, NUM_FILTERS)
     handler.train(1)
@@ -57,5 +59,5 @@ else:
     handler.model = K.models.load_model(
         os.path.join(CURRENT, MODEL_DIR))
     pp = ['i like this sentence is good', 'why does this not work frick shoot']
-    labels = [True, False]
+    labels = [1, 0]
     handler.predict(pp, labels)
