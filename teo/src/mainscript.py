@@ -1,6 +1,7 @@
 import os
 import pandas as pd
-from cnn_blstm import BlstmCnnUtility
+from cnn_blstm import CnnBlstmUtility
+from blstm_cnn import BlstmCnnUtility
 from tensorflow import keras as K
 import numpy as np
 import utils
@@ -10,7 +11,7 @@ DONT_TRAIN_JUST_LOAD = False
 # both relative to the SCRIPT, to avoid workdir hassle
 DATA_DIR = '../data/train.csv'
 GLOVE_DIR = '../glove/glove.6B.100d.txt'
-MODEL_DIR = '../models/teofakenews.h5'
+MODEL_DIR = '../models/'
 CLEAN_DATA_DIR = '../clean_data/clean_train.csv'
 
 SEQ_LEN = 1000
@@ -47,17 +48,22 @@ x_train = [str(elem) for elem in data_train.data]  # necessary
 y_train = data_train.labels
 
 # initialize network
-handler = BlstmCnnUtility([x_train, y_train], SEQ_LEN, GLOVE=True,
-                          glove_dir=FULL_GLOVE_DIR)
+cbhandler = CnnBlstmUtility([x_train, y_train], SEQ_LEN, GLOVE=True,
+                            glove_dir=FULL_GLOVE_DIR)
+bchandler = BlstmCnnUtility([x_train, y_train], SEQ_LEN, GLOVE=True,
+                            glove_dir=FULL_GLOVE_DIR)
 if not DONT_TRAIN_JUST_LOAD:
     # build model with specified convolution layers
-    handler.build_model(EMBED_DIM, FILTER_SIZES, NUM_FILTERS)
-    handler.train(1)
+    cbhandler.build_model(EMBED_DIM, FILTER_SIZES, NUM_FILTERS)
+    bchandler.build_model(EMBED_DIM, FILTER_SIZES, NUM_FILTERS)
+    cbhandler.train(3)
+    bchandler.train(3)
 
-    handler.save_model(os.path.join(CURRENT, MODEL_DIR))
+    cbhandler.save_model(os.path.join(CURRENT, MODEL_DIR))
+    bchandler.save_model(os.path.join(CURRENT, MODEL_DIR))
 else:
-    handler.model = K.models.load_model(
+    bchandler.model = K.models.load_model(
         os.path.join(CURRENT, MODEL_DIR))
     pp = ['i like this sentence is good', 'why does this not work frick shoot']
     labels = [1, 0]
-    handler.predict(pp, labels)
+    bchandler.predict(pp, labels)

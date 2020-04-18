@@ -10,6 +10,7 @@ from keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 import nltk
 import embed_utils
+import os
 
 TRAINABLE_GLOVE = False
 # number of words to keep (ordered by most frequent)
@@ -37,6 +38,7 @@ class ModelWrapper(ABC):
         self.x_train, self.x_test, self.x_val, self.y_train, self.y_test, self.y_val = (
             None, None, None, None, None, None)
         self.model = None
+        self.name = None
         self.data = data[0]
         # next line is necessary if clean_and_save was not run in main
         # self.data = [utils.clean_text(entry) for entry in texts]
@@ -77,13 +79,14 @@ class ModelWrapper(ABC):
         self.model.fit(self.x_train, self.y_train, batch_size=batch_size,
                        epochs=epochs, validation_data=(self.x_test, self.y_test))
 
-    def save_model(self, save_dir='./models'):
+    def save_model(self, save_dir='/models/'):
         """
         Wraps save model to avoid exposing model.
 
         yeah, it's public anyway, but this way i have to type less
         """
-        self.model.save(save_dir)
+
+        self.model.save(os.path.join(save_dir, f"{self.name}.h5"))
 
     # RECOMPUTE VALIDATION
     # (validation data is NEVER used, so can be used to compare different models)
@@ -145,4 +148,4 @@ class ModelWrapper(ABC):
             x, y, test_size=0.20)
         # 10% goes straight to validation.
         self.x_test, self.x_val, self.y_test, self.y_val = train_test_split(
-            self.x_test, self.y_val, test_size=0.50, random_state=42)
+            self.x_test, self.y_test, test_size=0.50)

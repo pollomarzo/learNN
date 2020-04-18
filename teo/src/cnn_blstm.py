@@ -2,13 +2,48 @@
 Implements a BLSTM convolutional neural network.
 
 Based on modelwrapper to avoid unnecessary confusion, only overrides build method
+Model: "sequential"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+embedding (Embedding)        (None, 1000, 100)         12554200  
+_________________________________________________________________
+conv1d (Conv1D)              (None, 1000, 32)          16032     
+_________________________________________________________________
+max_pooling1d (MaxPooling1D) (None, 500, 32)           0         
+_________________________________________________________________
+conv1d_1 (Conv1D)            (None, 500, 64)           6208      
+_________________________________________________________________
+max_pooling1d_1 (MaxPooling1 (None, 250, 64)           0         
+_________________________________________________________________
+lstm (LSTM)                  (None, 100)               66000     
+_________________________________________________________________
+batch_normalization (BatchNo (None, 100)               400       
+_________________________________________________________________
+dense (Dense)                (None, 256)               25856     
+_________________________________________________________________
+dense_1 (Dense)              (None, 128)               32896     
+_________________________________________________________________
+dense_2 (Dense)              (None, 1)                 129       
+=================================================================
+Total params: 12,701,721
+Trainable params: 147,321
+Non-trainable params: 12,554,400
+_________________________________________________________________
+Train on 16640 samples, validate on 2080 samples
+Epoch 1/3
+16640/16640 [==============================] - 92s 6ms/sample - loss: 0.3624 - accuracy: 0.8348 - val_loss: 0.4225 - val_accuracy: 0.8293
+Epoch 2/3
+16640/16640 [==============================] - 93s 6ms/sample - loss: 0.2238 - accuracy: 0.9089 - val_loss: 0.1896 - val_accuracy: 0.9274
+Epoch 3/3
+16640/16640 [==============================] - 95s 6ms/sample - loss: 0.1785 - accuracy: 0.9257 - val_loss: 0.2534 - val_accuracy: 0.9091
 """
 from tensorflow import keras as K
 import embed_utils
 from modelwrapper import ModelWrapper, TRAINABLE_GLOVE
 
 
-class BlstmCnnUtility(ModelWrapper):
+class CnnBlstmUtility(ModelWrapper):
     """
     just shutting up pylint
     """
@@ -20,6 +55,11 @@ class BlstmCnnUtility(ModelWrapper):
     # BUILD MODEL, COMPILE
     def build_model(self, embedding_size,
                     filter_sizes, num_filters, num_cells=100):
+        if self.GLOVE:
+            attr = "GLOVE"
+        else:
+            attr = "word2vec"
+        self.name = f"{attr}_{len(num_filters)}xConv_LSTM{num_cells}cell_fakenews"
         print("building model...")
 
         self.model = K.Sequential()
