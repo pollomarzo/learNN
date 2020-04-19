@@ -59,6 +59,13 @@ class BlstmCnnUtility(ModelWrapper):
     # BUILD MODEL, COMPILE
     def build_model(self, embedding_size,
                     filter_sizes, num_filters, num_cells=100):
+
+        if self.GLOVE:
+            attr = "GLOVE"
+        else:
+            attr = "word2vec"
+        self.name = f"{attr}_LSTM{num_cells}cell_{len(num_filters)}xConv_fakenews"
+
         print("building model...")
 
         # embed->blstm->cnn->pool->out

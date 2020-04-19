@@ -55,6 +55,7 @@ class CnnBlstmUtility(ModelWrapper):
     # BUILD MODEL, COMPILE
     def build_model(self, embedding_size,
                     filter_sizes, num_filters, num_cells=100):
+        # just giving a name to the model. have to find a better spot
         if self.GLOVE:
             attr = "GLOVE"
         else:
