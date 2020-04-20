@@ -13,7 +13,8 @@ CURRENT_DIR = os.path.dirname(__file__)
 DATA_DIR = '../data/train.csv'
 GLOVE_DIR = '../glove/glove.6B.100d.txt'
 MODEL_DIR = '../models/'
-CLEAN_DATA_DIR = '../clean_data/clean_train.csv'
+CLEAN_DATA_DIR = '../clean_data/'
+CLEAN_DATA_FILE = '../clean_data/clean_train.csv'
 
 SEQ_LEN = 1000
 VOC_SIZE = 200000
@@ -32,7 +33,7 @@ FULL_GLOVE_DIR = os.path.join(CURRENT_DIR, GLOVE_DIR)
 # create clean file usign utils.clean_and_save if not present
 utils.prepare_workspace(CURRENT_DIR, CLEAN_DATA_DIR, MODEL_DIR)
 try:
-    f = open(os.path.join(CURRENT_DIR, CLEAN_DATA_DIR))
+    f = open(os.path.join(CURRENT_DIR, CLEAN_DATA_FILE))
 except FileNotFoundError:
     data_train = pd.read_csv(FULL_DATA_DIR)
 
@@ -44,7 +45,7 @@ except FileNotFoundError:
     utils.clean_and_save(data_train, CURRENT_DIR, CLEAN_DATA_DIR)
 
 
-data_train = pd.read_csv(os.path.join(CURRENT_DIR, CLEAN_DATA_DIR))
+data_train = pd.read_csv(os.path.join(CURRENT_DIR, CLEAN_DATA_FILE))
 x_train = [str(elem) for elem in data_train.data]  # necessary
 y_train = data_train.labels
 

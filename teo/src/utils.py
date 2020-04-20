@@ -84,7 +84,7 @@ def clean_and_save(data, current_dir, save_dir="../clean_data/clean_train.csv"):
     clean = [clean_text(entry) for entry in texts]
     labels = data[1]
     total = [[clean[i], labels[i]] for i in range(len(clean))]
-    with open(save_dir, "w", newline="") as f:
+    with open(os.path.join(current_dir, save_dir), "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(('data', 'labels'))
         writer.writerows(total)
