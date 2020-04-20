@@ -4,13 +4,14 @@ Base class for implementing similar networks
 I'll use this as a boilerplate to simplify rest of the code
 """
 from abc import ABC, abstractmethod
+import os
 import numpy as np
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 import nltk
 import embed_utils
-import os
+from matplotlib import pyplot as plt
 
 TRAINABLE_GLOVE = False
 # number of words to keep (ordered by most frequent)
@@ -39,6 +40,7 @@ class ModelWrapper(ABC):
             None, None, None, None, None, None)
         self.model = None
         self.name = None
+        self.history = None
         self.data = data[0]
         # next line is necessary if clean_and_save was not run in main
         # self.data = [utils.clean_text(entry) for entry in texts]
@@ -73,11 +75,11 @@ class ModelWrapper(ABC):
         """
         Wraps fit method to avoid data input
 
-        as the data is already saved in constructor, no need to input again. 
+        as the data is already saved in constructor, no need to input again.
         uses test for validation
         """
-        self.model.fit(self.x_train, self.y_train, batch_size=batch_size,
-                       epochs=epochs, validation_data=(self.x_test, self.y_test))
+        self.history = self.model.fit(self.x_train, self.y_train, batch_size=batch_size,
+                                      epochs=epochs, validation_data=(self.x_test, self.y_test))
 
     def save_model(self, save_dir='/models/'):
         """
@@ -149,3 +151,24 @@ class ModelWrapper(ABC):
         # 10% goes straight to validation.
         self.x_test, self.x_val, self.y_test, self.y_val = train_test_split(
             self.x_test, self.y_test, test_size=0.50)
+
+    def draw_graph(self):
+        """
+        Uses pyplot to plot loss and accuracy on both training and testing set.
+
+        """
+        plt.plot(self.history.history['acc'])
+        plt.plot(self.history.history['val_acc'])
+        plt.title('model accuracy')
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'val'], loc='upper left')
+        plt.show()
+
+        plt.plot(self.history.history['loss'])
+        plt.plot(self.history.history['val_loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'val'], loc='upper left')
+        plt.show()

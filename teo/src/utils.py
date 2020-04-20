@@ -13,6 +13,7 @@ import csv
 # or https://github.com/pmsosa/CS291K/blob/master/batchgen.py
 
 MAX_NB_WORDS = 5000
+CURRENT_DIR = os.path.dirname(__file__)
 
 
 def clean_str(src):
@@ -76,14 +77,19 @@ def clean_text(text):
     # use it with pandas series with text = text.map(lambda x: clean_text(x))
 
 
-def clean_and_save(data, save_dir="../clean_data/clean_train.csv"):
+def clean_and_save(data, current_dir, save_dir="../clean_data/clean_train.csv"):
+    print("I see you've never run this before! Cleaning up training data")
+    print("This may take a while...")
     texts = data[0]
     clean = [clean_text(entry) for entry in texts]
     labels = data[1]
-    clean[1]
-    labels[1]
     total = [[clean[i], labels[i]] for i in range(len(clean))]
-    with open("/home/paolo/Documents/studies/teo/clean_data/clean_train.csv", "w", newline="") as f:
+    with open(save_dir, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(('data', 'labels'))
         writer.writerows(total)
+
+
+def prepare_workspace(current_dir, clean_data_dir, model_dir):
+    os.makedirs(os.path.join(current_dir, clean_data_dir), exist_ok=True)
+    os.makedirs(os.path.join(current_dir, model_dir), exist_ok=True)

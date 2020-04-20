@@ -7,6 +7,7 @@ import numpy as np
 import utils
 
 DONT_TRAIN_JUST_LOAD = False
+CURRENT_DIR = os.path.dirname(__file__)
 
 # both relative to the SCRIPT, to avoid workdir hassle
 DATA_DIR = '../data/train.csv'
@@ -24,14 +25,14 @@ USE_GPU = False  # requires cuda properly set up or running in a tensorflow-gpu
 if not USE_GPU:
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-CURRENT = os.path.dirname(__file__)
 
-FULL_DATA_DIR = os.path.join(CURRENT, DATA_DIR)
-FULL_GLOVE_DIR = os.path.join(CURRENT, GLOVE_DIR)
+FULL_DATA_DIR = os.path.join(CURRENT_DIR, DATA_DIR)
+FULL_GLOVE_DIR = os.path.join(CURRENT_DIR, GLOVE_DIR)
 
 # create clean file usign utils.clean_and_save if not present
+utils.prepare_workspace(CURRENT_DIR, CLEAN_DATA_DIR, MODEL_DIR)
 try:
-    f = open(os.path.join(CURRENT, CLEAN_DATA_DIR))
+    f = open(os.path.join(CURRENT_DIR, CLEAN_DATA_DIR))
 except FileNotFoundError:
     data_train = pd.read_csv(FULL_DATA_DIR)
 
@@ -40,10 +41,10 @@ except FileNotFoundError:
                for i in range(len(data_train.title))]
     y_train = data_train.label
     data_train = [x_train, y_train]
-    utils.clean_and_save(data_train)
+    utils.clean_and_save(data_train, CURRENT_DIR, CLEAN_DATA_DIR)
 
 
-data_train = pd.read_csv(os.path.join(CURRENT, CLEAN_DATA_DIR))
+data_train = pd.read_csv(os.path.join(CURRENT_DIR, CLEAN_DATA_DIR))
 x_train = [str(elem) for elem in data_train.data]  # necessary
 y_train = data_train.labels
 
@@ -59,11 +60,11 @@ if not DONT_TRAIN_JUST_LOAD:
     cbhandler.train(3)
     bchandler.train(3)
 
-    cbhandler.save_model(os.path.join(CURRENT, MODEL_DIR))
-    bchandler.save_model(os.path.join(CURRENT, MODEL_DIR))
+    cbhandler.save_model(os.path.join(CURRENT_DIR, MODEL_DIR))
+    bchandler.save_model(os.path.join(CURRENT_DIR, MODEL_DIR))
 else:
     bchandler.model = K.models.load_model(
-        os.path.join(CURRENT, MODEL_DIR))
+        os.path.join(CURRENT_DIR, MODEL_DIR))
     pp = ['i like this sentence is good', 'why does this not work frick shoot']
     labels = [1, 0]
     bchandler.predict(pp, labels)
