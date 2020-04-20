@@ -14,6 +14,7 @@ import csv
 
 MAX_NB_WORDS = 5000
 CURRENT_DIR = os.path.dirname(__file__)
+stemmer = nltk.stem.SnowballStemmer('english')
 
 
 def clean_str(src):
@@ -70,7 +71,6 @@ def clean_text(text):
     text = re.sub(r"didn t", "did not", text)
     # Stemming
     text = text.split()
-    stemmer = nltk.stem.SnowballStemmer('english')
     stemmed_words = [stemmer.stem(word) for word in text]
     text = " ".join(stemmed_words)
     return text
