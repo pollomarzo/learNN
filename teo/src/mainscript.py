@@ -1,9 +1,6 @@
 import os
 import pandas as pd
 from cnn_blstm import CnnBlstmUtility
-from blstm_cnn import BlstmCnnUtility
-from tensorflow import keras as K
-import numpy as np
 import utils
 
 DONT_TRAIN_JUST_LOAD = False
@@ -15,9 +12,11 @@ GLOVE_DIR = '../glove/glove.6B.100d.txt'
 MODEL_DIR = '../models/'
 CLEAN_DATA_DIR = '../clean_data/'
 CLEAN_DATA_FILE = '../clean_data/clean_train.csv'
+RESULTS_DIR = '../results/'
+TRAINING_HISTORY_DIR = '../results/training_history/'
 
 SEQ_LEN = 1000
-VOC_SIZE = 200000
+VOC_SIZE = 2000
 EMBED_DIM = 100
 FILTER_SIZES = [5, 3]
 NUM_FILTERS = [32, 64]
@@ -31,7 +30,8 @@ FULL_DATA_DIR = os.path.join(CURRENT_DIR, DATA_DIR)
 FULL_GLOVE_DIR = os.path.join(CURRENT_DIR, GLOVE_DIR)
 
 # create clean file usign utils.clean_and_save if not present
-utils.prepare_workspace(CURRENT_DIR, CLEAN_DATA_DIR, MODEL_DIR)
+utils.prepare_workspace(CURRENT_DIR, CLEAN_DATA_DIR,
+                        MODEL_DIR, TRAINING_HISTORY_DIR)
 try:
     f = open(os.path.join(CURRENT_DIR, CLEAN_DATA_FILE))
 except FileNotFoundError:
@@ -51,21 +51,19 @@ y_train = data_train.labels
 
 # initialize network
 cbhandler = CnnBlstmUtility([x_train, y_train], SEQ_LEN, GLOVE=True,
-                            glove_dir=FULL_GLOVE_DIR)
-bchandler = BlstmCnnUtility([x_train, y_train], SEQ_LEN, GLOVE=True,
-                            glove_dir=FULL_GLOVE_DIR)
+                            glove_dir=FULL_GLOVE_DIR, just_load=False)
+
 if not DONT_TRAIN_JUST_LOAD:
     # build model with specified convolution layers
     cbhandler.build_model(EMBED_DIM, FILTER_SIZES, NUM_FILTERS)
-    bchandler.build_model(EMBED_DIM, FILTER_SIZES, NUM_FILTERS)
-    cbhandler.train(3)
-    bchandler.train(3)
+    cbhandler.train(1)
 
-    cbhandler.save_model(os.path.join(CURRENT_DIR, MODEL_DIR))
-    bchandler.save_model(os.path.join(CURRENT_DIR, MODEL_DIR))
+    cbhandler.save_model(os.path.join(CURRENT_DIR, MODEL_DIR),
+                         os.path.join(CURRENT_DIR, RESULTS_DIR))
 else:
-    bchandler.model = K.models.load_model(
-        os.path.join(CURRENT_DIR, MODEL_DIR))
-    pp = ['i like this sentence is good', 'why does this not work frick shoot']
-    labels = [1, 0]
-    bchandler.predict(pp, labels)
+    cbhandler.load_model(os.path.join(
+        CURRENT_DIR, MODEL_DIR), os.path.join(CURRENT_DIR, RESULTS_DIR))
+    cbhandler.draw_graph()
+    # pp = ['i like this sentence is good', 'why does this not work frick shoot']
+    # labels = [1, 0]
+    # cbhandler.predict(pp, labels)

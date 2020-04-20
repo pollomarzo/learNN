@@ -3,8 +3,6 @@ import string
 import re
 import nltk
 from nltk.corpus import stopwords
-from keras.preprocessing.text import Tokenizer
-import numpy as np
 import csv
 
 
@@ -19,7 +17,7 @@ stemmer = nltk.stem.SnowballStemmer('english')
 
 def clean_str(src):
     """
-    Cleaning of dataset
+    Cleaning of dataset, small version
     """
     src = re.sub(r"\\", "", string)
     src = re.sub(r"\'", "", string)
@@ -28,6 +26,9 @@ def clean_str(src):
 
 
 def clean_text(text):
+    """
+    Cleans a single sentence
+    """
 
     # Remove puncuation
     text = text.translate(string.punctuation)
@@ -78,6 +79,9 @@ def clean_text(text):
 
 
 def clean_and_save(data, current_dir, clean_file_dir="../clean_data/clean_train.csv"):
+    """
+    cleans training data and saves it to clean_file_dir
+    """
     print("I see you've never run this before! Cleaning up training data")
     print("This may take a while...")
     texts = data[0]
@@ -90,6 +94,10 @@ def clean_and_save(data, current_dir, clean_file_dir="../clean_data/clean_train.
         writer.writerows(total)
 
 
-def prepare_workspace(current_dir, clean_data_dir, model_dir):
+def prepare_workspace(current_dir, clean_data_dir, model_dir, training_history_dir):
+    """
+    creates directories as specified, or if they exist does nothing
+    """
     os.makedirs(os.path.join(current_dir, clean_data_dir), exist_ok=True)
     os.makedirs(os.path.join(current_dir, model_dir), exist_ok=True)
+    os.makedirs(os.path.join(current_dir, training_history_dir), exist_ok=True)

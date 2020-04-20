@@ -2,17 +2,16 @@
 Implements a BLSTM convolutional neural network.
 
 Based on modelwrapper to avoid unnecessary confusion, only overrides build method
-Model: "sequential_1"
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #   
 =================================================================
 embedding_1 (Embedding)      (None, 1000, 100)         12554200  
 _________________________________________________________________
-lstm_1 (LSTM)                (None, 1000, 100)         80400     
+bidirectional_1 (Bidirection (None, 1000, 200)         160800    
 _________________________________________________________________
-dropout (Dropout)            (None, 1000, 100)         0         
+dropout (Dropout)            (None, 1000, 200)         0         
 _________________________________________________________________
-conv1d_2 (Conv1D)            (None, 1000, 32)          16032     
+conv1d_2 (Conv1D)            (None, 1000, 32)          32032     
 _________________________________________________________________
 max_pooling1d_2 (MaxPooling1 (None, 500, 32)           0         
 _________________________________________________________________
@@ -30,17 +29,6 @@ dense_4 (Dense)              (None, 128)               32896
 _________________________________________________________________
 dense_5 (Dense)              (None, 1)                 129       
 =================================================================
-Total params: 16,786,377
-Trainable params: 4,232,049
-Non-trainable params: 12,554,328
-
-Train on 16640 samples, validate on 2080 samples
-Epoch 1/3
-16640/16640 [==============================] - 365s 22ms/sample - loss: 0.7863 - accuracy: 0.7533 - val_loss: 0.4665 - val_accuracy: 0.7639
-Epoch 2/3
-16640/16640 [==============================] - 349s 21ms/sample - loss: 0.3016 - accuracy: 0.8742 - val_loss: 0.6964 - val_accuracy: 0.7183
-Epoch 3/3
-16640/16640 [==============================] - 350s 21ms/sample - loss: 0.2327 - accuracy: 0.9037 - val_loss: 0.3881 - val_accuracy: 0.8317
 """
 from tensorflow import keras as K
 import embed_utils
@@ -95,8 +83,9 @@ class BlstmCnnUtility(ModelWrapper):
         # all the outputs so far in the form of (num_samples, timesteps,
         # output_dim). to be checked again... convolution wants 3-dim i think
         # noot sure i understand this fully, but just know it's right
-        self.model.add(K.layers.LSTM(units=num_cells, input_shape=(None, embedding_size),
-                                     dropout=0.4, return_sequences=True, batch_size=1))
+        self.model.add(K.layers.Bidirectional(
+            K.layers.LSTM(units=num_cells, input_shape=(None, embedding_size),
+                          dropout=0.4, return_sequences=True, batch_size=1)))
         self.model.add(K.layers.Dropout(0.2))
 
         print("\t adding convolution layers...")

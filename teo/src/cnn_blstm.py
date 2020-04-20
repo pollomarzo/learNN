@@ -2,7 +2,7 @@
 Implements a BLSTM convolutional neural network.
 
 Based on modelwrapper to avoid unnecessary confusion, only overrides build method
-Model: "sequential"
+
 _________________________________________________________________
 Layer (type)                 Output Shape              Param #   
 =================================================================
@@ -16,27 +16,16 @@ conv1d_1 (Conv1D)            (None, 500, 64)           6208
 _________________________________________________________________
 max_pooling1d_1 (MaxPooling1 (None, 250, 64)           0         
 _________________________________________________________________
-lstm (LSTM)                  (None, 100)               66000     
+bidirectional (Bidirectional (None, 200)               132000    
 _________________________________________________________________
-batch_normalization (BatchNo (None, 100)               400       
+batch_normalization (BatchNo (None, 200)               800       
 _________________________________________________________________
-dense (Dense)                (None, 256)               25856     
+dense (Dense)                (None, 256)               51456     
 _________________________________________________________________
 dense_1 (Dense)              (None, 128)               32896     
 _________________________________________________________________
 dense_2 (Dense)              (None, 1)                 129       
 =================================================================
-Total params: 12,701,721
-Trainable params: 147,321
-Non-trainable params: 12,554,400
-_________________________________________________________________
-Train on 16640 samples, validate on 2080 samples
-Epoch 1/3
-16640/16640 [==============================] - 92s 6ms/sample - loss: 0.3624 - accuracy: 0.8348 - val_loss: 0.4225 - val_accuracy: 0.8293
-Epoch 2/3
-16640/16640 [==============================] - 93s 6ms/sample - loss: 0.2238 - accuracy: 0.9089 - val_loss: 0.1896 - val_accuracy: 0.9274
-Epoch 3/3
-16640/16640 [==============================] - 95s 6ms/sample - loss: 0.1785 - accuracy: 0.9257 - val_loss: 0.2534 - val_accuracy: 0.9091
 """
 from tensorflow import keras as K
 import embed_utils
@@ -83,9 +72,6 @@ class CnnBlstmUtility(ModelWrapper):
                                               embedding_matrix],
                                           trainable=TRAINABLE_GLOVE))
 
-        # self.model.add(K.layers.Bidirectional(K.layers.LSTM(
-        #   units=num_cells, dropout=0.4, recurrent_dropout=0.4,return_sequences=True)))
-
         print("\t adding convolution layers...")
         for i, size in enumerate(filter_sizes):
             self.model.add(K.layers.Conv1D(
@@ -94,8 +80,8 @@ class CnnBlstmUtility(ModelWrapper):
             self.model.add(K.layers.MaxPool1D(pool_size=2))
         print("\t ..added convolution!")
 
-        self.model.add(K.layers.LSTM(
-            units=num_cells, dropout=0.2))
+        self.model.add(K.layers.Bidirectional(K.layers.LSTM(
+            units=num_cells, dropout=0.2)))
         # self.model.add(K.layers.Dropout(0.2))
 
         self.model.add(K.layers.BatchNormalization())
