@@ -42,7 +42,7 @@ except FileNotFoundError:
                for i in range(len(data_train.title))]
     y_train = data_train.label
     data_train = [x_train, y_train]
-    utils.clean_and_save(data_train, CURRENT_DIR, CLEAN_DATA_DIR)
+    utils.clean_and_save(data_train, CURRENT_DIR, CLEAN_DATA_FILE)
 
 
 data_train = pd.read_csv(os.path.join(CURRENT_DIR, CLEAN_DATA_FILE))

@@ -77,14 +77,14 @@ def clean_text(text):
     # use it with pandas series with text = text.map(lambda x: clean_text(x))
 
 
-def clean_and_save(data, current_dir, save_dir="../clean_data/clean_train.csv"):
+def clean_and_save(data, current_dir, clean_file_dir="../clean_data/clean_train.csv"):
     print("I see you've never run this before! Cleaning up training data")
     print("This may take a while...")
     texts = data[0]
     clean = [clean_text(entry) for entry in texts]
     labels = data[1]
     total = [[clean[i], labels[i]] for i in range(len(clean))]
-    with open(os.path.join(current_dir, save_dir), "w", newline="") as f:
+    with open(os.path.join(current_dir, clean_file_dir), "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(('data', 'labels'))
         writer.writerows(total)
