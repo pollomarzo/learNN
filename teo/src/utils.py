@@ -94,10 +94,15 @@ def clean_and_save(data, current_dir, clean_file_dir="../clean_data/clean_train.
         writer.writerows(total)
 
 
-def prepare_workspace(current_dir, clean_data_dir, model_dir, training_history_dir):
+def prepare_workspace(current_dir, DIRECTORIES):
     """
     creates directories as specified, or if they exist does nothing
     """
-    os.makedirs(os.path.join(current_dir, clean_data_dir), exist_ok=True)
-    os.makedirs(os.path.join(current_dir, model_dir), exist_ok=True)
-    os.makedirs(os.path.join(current_dir, training_history_dir), exist_ok=True)
+    os.makedirs(os.path.join(
+        current_dir, DIRECTORIES.CLEAN_DATA_DIR), exist_ok=True)
+    os.makedirs(os.path.join(
+        current_dir, DIRECTORIES.MODEL_DIR), exist_ok=True)
+    os.makedirs(os.path.join(
+        current_dir, DIRECTORIES.TRAINING_HISTORY_DIR), exist_ok=True)
+    os.makedirs(os.path.join(
+        current_dir, DIRECTORIES.TEST_RESULT_DIR), exist_ok=True)

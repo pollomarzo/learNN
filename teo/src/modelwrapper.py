@@ -13,10 +13,9 @@ from tensorflow import keras as K
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
-import embed_utils
 from matplotlib import pyplot as plt
 
-TRAINABLE_GLOVE = False
+
 # number of words to keep (ordered by most frequent)
 MAX_NB_WORDS = 20000
 HISTORY_DIR = 'training_history/'
@@ -29,7 +28,7 @@ class ModelWrapper(ABC):
     Build method to be implemented on each subclass(hence network type)
     """
 
-    def __init__(self, data, sequence_length, GLOVE=False, glove_dir=None, just_load=False):
+    def __init__(self, data, sequence_length, embed_type, pretrained_embeds_file=None, just_load=False):
         """
         Constructor, saves data as class attribute
 
@@ -44,8 +43,13 @@ class ModelWrapper(ABC):
             None, None, None, None, None, None)
         self.model = None
         self.name = None
+        # holds the embedding CLASS
+        self.embedding = None
+        # holds the embedding TYPE, in a string (to be used for naming)
+        self.embed_type = None
         # dictionary, NOT History class
         self.history = None
+
         self.data = data[0]
         # next line is necessary if clean_and_save was not run in main
         # self.data = [utils.clean_text(entry) for entry in texts]
@@ -58,16 +62,17 @@ class ModelWrapper(ABC):
             self.data = pad_sequences(
                 self.tokenizer.texts_to_sequences(self.data), maxlen=sequence_length)
             self.split_data()
+            # initialize embedding, using tokenized data
+            self.embedding = embed_type(
+                pretrained_embeds_file, sequence_length, self.tokenizer.word_index)
+            self.embed_type = self.embedding.name
             print("..done!")
 
-            if GLOVE:
-                print("loading glove...")
-                self.GLOVE = GLOVE
-                self.glove_dir = glove_dir
-                # embeddings_index is a dict, word to glove embedding vector
-                self.embeddings_index = embed_utils.loadglove(glove_dir)
-                print("..done!")
-
+    def buid_embedding(self):
+        """
+        wraps the embedding layer function for cleanliness
+        """
+        return self.embedding.build_embedding()
     # BUILD MODEL, COMPILE
     @abstractmethod
     def build_model(self, embedding_size,
@@ -87,17 +92,29 @@ class ModelWrapper(ABC):
         self.history = self.model.fit(self.x_train, self.y_train, batch_size=batch_size,
                                       epochs=epochs, validation_data=(self.x_test, self.y_test)).history
 
-    def save_model(self, model_dir='../models/', results_dir='../results/'):
+    def save_model(self, current_dir, DIRECTORIES):
         """
         Wraps save model to avoid exposing model and pickles history.
 
         yeah, it's public anyway, but this way i have to type less
         """
+        results_dir = DIRECTORIES.RESULTS_DIR
+        model_dir = os.path.join(current_dir, DIRECTORIES.MODEL_DIR)
+        history_dir = os.path.join(
+            current_dir, DIRECTORIES.TRAINING_HISTORY_DIR)
+        test_result_dir = os.path.join(
+            current_dir, DIRECTORIES.TEST_RESULT_DIR)
         if self.model != None:
             print(f"Saving model with name {self.name}.h5")
             self.model.save(os.path.join(model_dir, f"{self.name}.h5"))
-            with open(os.path.join(results_dir, HISTORY_DIR, f"{self.name}HISTORY.pickled"), 'wb') as fp:
+            with open(os.path.join(
+                    results_dir, history_dir, f"{self.name}HISTORY.pickled"), 'wb') as fp:
                 pickle.dump(self.history, fp)
+            with open(os.path.join(
+                    results_dir, test_result_dir, f"{self.name}test_results.txt"), 'w') as f:
+                print('This model\'s training ended with train, test accuracy = ',
+                      self.history['accuracy'][-1],
+                      self.history['val_accuracy'][-1], file=f)
         else:
             print("Hmmm... you'll need to train something first!")
 
@@ -109,7 +126,6 @@ class ModelWrapper(ABC):
                           if os.path.isfile(os.path.join(model_dir, f))]
         if possiblemodels == []:
             print("No models found!")
-            return None
         else:
             # i don't want the extension, so split on '.' at most once and take first piece
             self.name = possiblemodels[

@@ -28,8 +28,7 @@ dense_2 (Dense)              (None, 1)                 129
 =================================================================
 """
 from tensorflow import keras as K
-import embed_utils
-from modelwrapper import ModelWrapper, TRAINABLE_GLOVE
+from modelwrapper import ModelWrapper
 
 
 class CnnBlstmUtility(ModelWrapper):
@@ -45,32 +44,12 @@ class CnnBlstmUtility(ModelWrapper):
     def build_model(self, embedding_size,
                     filter_sizes, num_filters, num_cells=100):
         # just giving a name to the model. have to find a better spot
-        if self.GLOVE:
-            attr = "GLOVE"
-        else:
-            attr = "word2vec"
-        self.name = f"{attr}_{len(num_filters)}xConv_LSTM{num_cells}cell_fakenews"
+        self.name = f"{self.embed_type}_{len(num_filters)}xConv_LSTM{num_cells}cell_fakenews"
+
         print("building model...")
-
         self.model = K.Sequential()
-        # EMBEDDING
 
-        if self.GLOVE:
-            print("\tcreating embedding matrix with glove values...")
-            print('\t', end='')
-
-            # maybe should try random vs zeros. you never know [scratch that]
-            embedding_matrix = embed_utils.pretrained_embedding_matrix(
-                embedding_size, self.tokenizer.word_index, self.embeddings_index)
-            print("\tembedding matrix created!")
-        else:
-            # create embedding_matrix with word2vec
-            pass
-
-        self.model.add(K.layers.Embedding(len(self.tokenizer.word_index) + 1, embedding_size,
-                                          input_length=self.sequence_length, weights=[
-                                              embedding_matrix],
-                                          trainable=TRAINABLE_GLOVE))
+        self.model.add(self.embedding.build_embedding())
 
         print("\t adding convolution layers...")
         for i, size in enumerate(filter_sizes):
