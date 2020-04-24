@@ -2,7 +2,7 @@ import os
 from collections import namedtuple
 import pandas as pd
 from cnn_blstm import CnnBlstmUtility
-from embeddings import GloveEmbedding
+from embeddings import GloveEmbedding, Word2vecEmbedding
 import utils
 
 DONT_TRAIN_JUST_LOAD = False
@@ -10,10 +10,10 @@ DONT_TRAIN_JUST_LOAD = False
 CURRENT_DIR = os.path.dirname(__file__)
 # all relative to the SCRIPT, to avoid workdir hassle
 dirstruct = namedtuple(
-    'dirstruct', 'DATA_DIR GLOVE_DIR MODEL_DIR CLEAN_DATA_DIR CLEAN_DATA_FILE RESULTS_DIR TRAINING_HISTORY_DIR TEST_RESULT_DIR')
+    'dirstruct', 'DATA_DIR EMBED_FILE MODEL_DIR CLEAN_DATA_DIR CLEAN_DATA_FILE RESULTS_DIR TRAINING_HISTORY_DIR TEST_RESULT_DIR')
 DIRECTORIES = dirstruct(
     DATA_DIR='../data/train.csv',
-    GLOVE_DIR='../glove/glove.6B.100d.txt',
+    EMBED_FILE='../word2vec/word2vec.100d.txt',
     MODEL_DIR='../models/',
     CLEAN_DATA_DIR='../clean_data/',
     CLEAN_DATA_FILE='../clean_data/clean_train.csv',
@@ -34,7 +34,7 @@ if not USE_GPU:
 
 
 FULL_DATA_DIR = os.path.join(CURRENT_DIR, DIRECTORIES.DATA_DIR)
-FULL_GLOVE_DIR = os.path.join(CURRENT_DIR, DIRECTORIES.GLOVE_DIR)
+FULL_EMBED_FILE = os.path.join(CURRENT_DIR, DIRECTORIES.EMBED_FILE)
 
 # create clean file usign utils.clean_and_save if not present
 utils.prepare_workspace(CURRENT_DIR, DIRECTORIES)
@@ -58,7 +58,7 @@ y_train = data_train.labels
 
 # initialize network
 cbhandler = CnnBlstmUtility([x_train, y_train], SEQ_LEN,
-                            GloveEmbedding, FULL_GLOVE_DIR, just_load=False)
+                            Word2vecEmbedding, FULL_EMBED_FILE, just_load=False)
 
 if not DONT_TRAIN_JUST_LOAD:
     # build model with specified convolution layers

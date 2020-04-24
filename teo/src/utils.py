@@ -4,7 +4,8 @@ import re
 import nltk
 from nltk.corpus import stopwords
 import csv
-
+import pandas as pd
+from tqdm import trange
 
 # consider subs in
 # https://medium.com/@sabber/classifying-yelp-review-comments-using-lstm-and-word-embeddings-part-1-eb2275e4066b
@@ -85,13 +86,15 @@ def clean_and_save(data, current_dir, clean_file_dir="../clean_data/clean_train.
     print("I see you've never run this before! Cleaning up training data")
     print("This may take a while...")
     texts = data[0]
-    clean = [clean_text(entry) for entry in texts]
+    clean = [clean_text(texts[i]) for i in trange(len(data[0]))]
     labels = data[1]
     total = [[clean[i], labels[i]] for i in range(len(clean))]
     with open(os.path.join(current_dir, clean_file_dir), "w", newline="") as f:
+        print("\tWriting to file...")
         writer = csv.writer(f)
         writer.writerow(('data', 'labels'))
         writer.writerows(total)
+        print("\tDone!")
 
 
 def prepare_workspace(current_dir, DIRECTORIES):

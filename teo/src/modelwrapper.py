@@ -51,10 +51,8 @@ class ModelWrapper(ABC):
         self.history = None
 
         self.data = data[0]
-        # next line is necessary if clean_and_save was not run in main
-        # self.data = [utils.clean_text(entry) for entry in texts]
         self.labels = np.asarray(data[1])
-        # self.labels = to_categorical(np.asarray(data[1]), num_classes=2)
+
         if not just_load:
             self.tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
             self.tokenizer.fit_on_texts(self.data)
@@ -62,11 +60,13 @@ class ModelWrapper(ABC):
             self.data = pad_sequences(
                 self.tokenizer.texts_to_sequences(self.data), maxlen=sequence_length)
             self.split_data()
-            # initialize embedding, using tokenized data
+            # initialize embedding, using tokenized data. if embedding is created on the fly,
+            # the data will be needed! otherwise, just an unused argument
             self.embedding = embed_type(
-                pretrained_embeds_file, sequence_length, self.tokenizer.word_index)
+                sequence_length, self.tokenizer,
+                data=self.x_train, save_file=pretrained_embeds_file)
             self.embed_type = self.embedding.name
-            print("..done!")
+        print("..done!")
 
     def buid_embedding(self):
         """

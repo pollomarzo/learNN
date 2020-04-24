@@ -37,8 +37,8 @@ class CnnBlstmUtility(ModelWrapper):
     """
     ##############################################
     # Constructor
-    # def __init__(self, data, labels, sequence_length, GLOVE=False, glove_dir=None):
-    #    super().__init__(data, labels, sequence_length, GLOVE, glove_dir)
+    # def __init__(self, data, labels, sequence_length, GLOVE=False, EMBED_FILE=None):
+    #    super().__init__(data, labels, sequence_length, GLOVE, EMBED_FILE)
 
     # BUILD MODEL, COMPILE
     def build_model(self, embedding_size,
