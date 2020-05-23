@@ -1,0 +1,1 @@
+Yo! This is where I study stuff. ML, NN, AI and all the hype abbreviations. don't know why you're here, hope you can find something useful.

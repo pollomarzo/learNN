@@ -96,3 +96,9 @@ tmrw:
 
 20-04-2020
     the handler class was revamped multiple times. turns out, i'd made a mistake! fixed now, and with better methods
+
+24-04-2020
+    included Word2Vec
+
+23-05-2020
+    started working on russelnorvig. for real now.
