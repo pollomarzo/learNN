@@ -58,7 +58,7 @@ y_train = data_train.labels
 
 # initialize network
 cbhandler = CnnBlstmUtility([x_train, y_train], SEQ_LEN,
-                            Word2vecEmbedding, FULL_EMBED_FILE, just_load=False)
+                            GloveEmbedding, FULL_EMBED_FILE, just_load=False)
 
 if not DONT_TRAIN_JUST_LOAD:
     # build model with specified convolution layers
