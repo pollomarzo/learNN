@@ -1,0 +1,13 @@
+tmp
+glove
+models
+data
+res
+/.vscode
+/books
+.vscode
+__pycache__
+clean_data
+training_history
+test_results
+word2vec
