@@ -6,12 +6,12 @@ from ex_QuantLeNet import QuantLeNet
 # number of words to keep (ordered by most frequent)
 MAX_NB_WORDS = 20000
 HISTORY_DIR = 'training_history/'
+embedding_size = 100
 
 
 class ModelWrapper():
 
-    def __init__(self, data, embedding_size,
-                 filter_sizes, num_filters):
+    def __init__(self, data, filter_sizes, num_filters):
         """
         Constructor, saves data as class attribute
         Expects training data to be the CLEAN and first element, and labels as the second
@@ -107,7 +107,7 @@ class ModelWrapper():
             return accuracy, predictions
 
         return predictions
- """
+"""
 """ 
        def split_data(self):
            # for int, like range but returns ndarray
