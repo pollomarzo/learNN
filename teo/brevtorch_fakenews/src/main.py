@@ -83,12 +83,12 @@ torch.cuda.manual_seed(SEED)
 TEXT = data.Field(lower=True, batch_first=True)
 LABEL = data.LabelField(dtype=torch.float)
 
-train_data, test_data = datasets.IMDB.splits(TEXT, LABEL, root='/tmp/imdb/')
+train_data, test_data = datasets.IMDB.splits(TEXT, LABEL, root='../tmp/imdb/')
 train_data, valid_data = train_data.split(
     split_ratio=0.8, random_state=random.seed(SEED))
 
 TEXT.build_vocab(train_data, vectors=GloVe(
-    name='6B', dim=100, cache='/tmp/glove/'))
+    name='6B', dim=100, cache='../tmp/glove/'))
 
 LABEL.build_vocab(train_data)
 # BucketIterator pads every element of a batch to the length of the longest element of the batch.
@@ -173,7 +173,7 @@ def log_training_results(engine):
 # Below we'll use Ignite's ModelCheckpoint handler to checkpoint
 # models at the end of each epoch.
 checkpointer = ModelCheckpoint(
-    '/tmp/models', 'textcnn', n_saved=2, create_dir=True, save_as_state_dict=True)
+    '../tmp/models', 'textcnn', n_saved=2, create_dir=True, save_as_state_dict=True, require_empty=False)
 trainer.add_event_handler(Events.EPOCH_COMPLETED,
                           checkpointer, {'textcnn': model})
 trainer.run(train_iterator, max_epochs=20)
