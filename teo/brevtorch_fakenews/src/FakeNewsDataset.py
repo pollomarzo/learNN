@@ -16,8 +16,8 @@ class FakeNewsDataset(Dataset):
     def __init__(self, csv_path, text_field, label_field):
         # full_data is a DataFrame with data and labels fields
         full_data = pd.read_csv(csv_path)
-        data = np.asarray(full_data.data)
-        labels = np.asarray(full_data.labels)
+        data = [str(i) for i in full_data.data]
+        labels = full_data.labels
 
         fields = [('text', text_field), ('label', label_field)]
         examples = []

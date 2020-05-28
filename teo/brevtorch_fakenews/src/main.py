@@ -64,7 +64,7 @@ def eval_function(engine, batch):
 ########################################################################################################################################
 
 
-CLEAN_DATA_FILE = '../clean_data/small.csv'
+CLEAN_DATA_FILE = '../clean_data/clean_train.csv'
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 """
