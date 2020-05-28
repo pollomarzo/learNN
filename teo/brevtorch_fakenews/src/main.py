@@ -20,6 +20,7 @@ from torchtext import datasets
 from torchtext.vocab import GloVe
 
 from TextCNN import TextCNN
+from FakeNewsDataset import FakeNewsDataset
 ########################################################################################################################################
 """
 Let's walk through what the function of the trainer does:
@@ -63,7 +64,7 @@ def eval_function(engine, batch):
 ########################################################################################################################################
 
 
-CLEAN_DATA_FILE = '../clean_data/clean.csv'
+CLEAN_DATA_FILE = '~/Documents/studies/teo/brevtorch_fakenews/clean_data/small.csv'
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 """
@@ -80,10 +81,15 @@ x_train, x_test, x_val, y_train, y_test, y_val = utils.split_data(data, labels)
 SEED = 1234
 torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
+
 TEXT = data.Field(lower=True, batch_first=True)
 LABEL = data.LabelField(dtype=torch.float)
 
-train_data, test_data = datasets.IMDB.splits(TEXT, LABEL, root='../tmp/imdb/')
+text_data = FakeNewsDataset(CLEAN_DATA_FILE, TEXT, LABEL)
+
+
+train_data, test_data = text_data.split()
+# train_data, test_data = datasets.IMDB.splits(TEXT, LABEL, root='../tmp/imdb/')
 train_data, valid_data = train_data.split(
     split_ratio=0.8, random_state=random.seed(SEED))
 
