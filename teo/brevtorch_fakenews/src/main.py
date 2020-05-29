@@ -1,5 +1,4 @@
 import random
-from modelwrapper import ModelWrapper
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -21,6 +20,7 @@ from torchtext.vocab import GloVe
 
 from TextCNN import TextCNN
 from FakeNewsDataset import FakeNewsDataset
+from ex_QuantLeNet import QuantLeNet
 ########################################################################################################################################
 """
 Let's walk through what the function of the trainer does:
@@ -64,9 +64,9 @@ def eval_function(engine, batch):
 ########################################################################################################################################
 
 
-CLEAN_DATA_FILE = '../clean_data/clean_train.csv'
+CLEAN_DATA_FILE = '../clean_data/small.csv'
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 """
 STUFF = None
 num_filters = [5, 3]
@@ -103,14 +103,14 @@ train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits((trai
                                                                            device=device)
 vocab_size, embedding_dim = TEXT.vocab.vectors.shape
 
-model = TextCNN(vocab_size=vocab_size,
-                embedding_dim=embedding_dim,
-                kernel_sizes=[3, 4, 5],
-                num_filters=100,
-                num_classes=1,
-                d_prob=0.5,
-                mode='static',
-                TEXT=TEXT)
+model = QuantLeNet(vocab_size=vocab_size,
+                   embedding_dim=embedding_dim,
+                   kernel_sizes=[3, 4, 5],
+                   num_filters=100,
+                   num_classes=1,
+                   d_prob=0.5,
+                   mode='static',
+                   TEXT=TEXT)
 model.to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-3)
 criterion = nn.BCELoss()
