@@ -182,4 +182,4 @@ checkpointer = ModelCheckpoint(
     '../tmp/models', 'textcnn', n_saved=2, create_dir=True, save_as_state_dict=True, require_empty=False)
 trainer.add_event_handler(Events.EPOCH_COMPLETED,
                           checkpointer, {'textcnn': model})
-trainer.run(train_iterator, max_epochs=20)
+trainer.run(train_iterator, max_epochs=5)
