@@ -1,27 +1,17 @@
 import random
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from torchtext.vocab import GloVe
-from sklearn.model_selection import train_test_split
-import utils
-import pandas as pd
-import numpy as np
-
 from ignite.engine import Engine, Events
 from ignite.metrics import Accuracy, Loss, RunningAverage
 from ignite.handlers import ModelCheckpoint, EarlyStopping
 from ignite.contrib.handlers import ProgressBar
-
-
 from torchtext import data
-from torchtext import datasets
-from torchtext.vocab import GloVe
-
-from TextCNN import TextCNN
 from FakeNewsDataset import FakeNewsDataset
 from ex_QuantLeNet import QuantLeNet
-########################################################################################################################################
+import torch.onnx
+
+###############################################################################
 """
 Let's walk through what the function of the trainer does:
 
@@ -30,7 +20,8 @@ Let's walk through what the function of the trainer does:
     Generate x and y from batch.
     Performs a forward pass to calculate y_pred using model and x.
     Calculates loss using y_pred and y.
-    Performs a backward pass using loss to calculate gradients for the model parameters.
+    Performs a backward pass using loss to calculate gradients for the
+    model parameters.
     model parameters are optimized using gradients and optimizer.
     Returns scalar loss.
 """
@@ -49,9 +40,16 @@ def process_function(engine, batch):
 
 """
 With torch.no_grad(), no gradients are calculated for any succeding steps.
-Ignite suggests attaching metrics to evaluators and not trainers because during the training the model parameters are constantly changing and it is best to evaluate model on a stationary model. This information is important as there is a difference in the functions for training and evaluating. Training returns a single scalar loss. Evaluating returns y_pred and y as that output is used to calculate metrics per batch for the entire dataset.
+Ignite suggests attaching metrics to evaluators and not trainers because
+during the training the model parameters are constantly changing and it
+is best to evaluate model on a stationary model. This information is
+important as there is a difference in the functions for training and
+evaluating. Training returns a single scalar loss. Evaluating returns
+y_pred and y as that output is used to calculate metrics per batch for
+the entire dataset.
 
-All metrics in Ignite require y_pred and y as outputs of the function attached to the Engine.
+All metrics in Ignite require y_pred and y as outputs of the function attached
+to the Engine.
 """
 
 
@@ -61,21 +59,12 @@ def eval_function(engine, batch):
         x, y = batch.text, batch.label
         y_pred = model(x)
         return y_pred, y
-########################################################################################################################################
+##############################################################################
 
 
 CLEAN_DATA_FILE = '../clean_data/small.csv'
 
 device = torch.device('cpu')
-"""
-STUFF = None
-num_filters = [5, 3]
-filter_sizes = [32, 64]
-data_train = pd.read_csv(CLEAN_DATA_FILE)
-data = [str(elem) for elem in data_train.data]
-labels = data_train.labels
-x_train, x_test, x_val, y_train, y_test, y_val = utils.split_data(data, labels)
-"""
 
 
 SEED = 1234
@@ -89,7 +78,6 @@ text_data = FakeNewsDataset(CLEAN_DATA_FILE, TEXT, LABEL)
 
 
 train_data, test_data = text_data.split()
-# train_data, test_data = datasets.IMDB.splits(TEXT, LABEL, root='../tmp/imdb/')
 train_data, valid_data = train_data.split(
     split_ratio=0.8, random_state=random.seed(SEED))
 
@@ -97,10 +85,12 @@ TEXT.build_vocab(train_data, vectors=GloVe(
     name='6B', dim=100, cache='../tmp/glove/'))
 
 LABEL.build_vocab(train_data)
-# BucketIterator pads every element of a batch to the length of the longest element of the batch.
-train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits((train_data, valid_data, test_data),
-                                                                           batch_size=32,
-                                                                           device=device)
+# BucketIterator pads every element of a batch to the length of the
+# longest element of the batch.
+train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits(
+    (train_data, valid_data, test_data),
+    batch_size=32,
+    device=device)
 vocab_size, embedding_dim = TEXT.vocab.vectors.shape
 
 model = QuantLeNet(vocab_size=vocab_size,
@@ -120,11 +110,11 @@ train_evaluator = Engine(eval_function)
 validation_evaluator = Engine(eval_function)
 
 # To attach a metric to engine, the following format is used:
-#   Metric(output_transform=output_transform, ...).attach(engine, 'metric_name')
+#  Metric(output_transform=output_transform, ...).attach(engine, 'metric_name')
 #
 RunningAverage(output_transform=lambda x: x).attach(trainer, 'loss')
 
-# For Accuracy, Ignite requires y_pred and y to be comprised of 0's and 1's only.
+# For Accuracy, Ignite requires y_pred and y to be 0's and 1's only.
 # Since our model outputs from a sigmoid layer, values are between 0 and 1.
 # We'll need to write a function that transforms engine.state.output which is
 # comprised of y_pred and y.
@@ -172,6 +162,7 @@ def log_training_results(engine):
         .format(engine.state.epoch, avg_accuracy, avg_bce))
 
 
+"""
 # Lastly, we want to checkpoint this model. It's important to do so,
 # as training processes can be time consuming and if for some reason
 # something goes wrong during training, a model checkpoint can be helpful
@@ -179,7 +170,28 @@ def log_training_results(engine):
 # Below we'll use Ignite's ModelCheckpoint handler to checkpoint
 # models at the end of each epoch.
 checkpointer = ModelCheckpoint(
-    '../tmp/models', 'textcnn', n_saved=2, create_dir=True, save_as_state_dict=True, require_empty=False)
+    '../tmp/models', 'textcnn', n_saved=2, create_dir=True,
+    save_as_state_dict=True, require_empty=False)
 trainer.add_event_handler(Events.EPOCH_COMPLETED,
                           checkpointer, {'textcnn': model})
+"""
+
 trainer.run(train_iterator, max_epochs=5)
+
+x = next(iter(train_iterator)).text
+model(x)
+torch.onnx.export(model,
+                  x,
+                  "../models/ONNX/fakenews.onnx",
+                  export_params=True,
+                  input_names=['input'],
+                  output_names=['output'],
+                  dynamic_axes={'input': {0: 'batch_size'},
+                                'output': {0: 'batch_size'}})
+# right. well, clearly brevitas wasn't really designed to be exported.
+# tracing the model, which is what pytorch does when calling it first
+# pops out a couple warnings then gives up completely. If that wasn't
+# enough, im not sure the model would work with variable-size inputs:
+# `Similarly, a trace is likely to be valid only for a specific input
+# size (which is one reason why we require explicit inputs on tracing)`
+# so... not sure what i should do

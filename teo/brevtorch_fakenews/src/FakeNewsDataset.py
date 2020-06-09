@@ -1,14 +1,11 @@
 import pandas as pd
-import numpy as np
-import torch
 from torchtext.data.dataset import Dataset
-from torchtext.data.dataset import check_split_ratio
 from torchtext.data import Example
 
 
 class FakeNewsDataset(Dataset):
     """
-    Implements a dataset that reads from a clean data csv file. 
+    Implements a dataset that reads from a clean data csv file.
 
     Extremely simple for now, may move the cleaning section here in the future
     """
