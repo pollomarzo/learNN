@@ -10,6 +10,7 @@ from torchtext import data
 from FakeNewsDataset import FakeNewsDataset
 from ex_QuantLeNet import QuantLeNet
 import torch.onnx
+import brevitas.torch.onnx as bo
 
 ###############################################################################
 """
@@ -178,20 +179,7 @@ trainer.add_event_handler(Events.EPOCH_COMPLETED,
 
 trainer.run(train_iterator, max_epochs=5)
 
-x = next(iter(train_iterator)).text
-model(x)
-torch.onnx.export(model,
-                  x,
-                  "../models/ONNX/fakenews.onnx",
-                  export_params=True,
-                  input_names=['input'],
-                  output_names=['output'],
-                  dynamic_axes={'input': {0: 'batch_size'},
-                                'output': {0: 'batch_size'}})
-# right. well, clearly brevitas wasn't really designed to be exported.
-# tracing the model, which is what pytorch does when calling it first
-# pops out a couple warnings then gives up completely. If that wasn't
-# enough, im not sure the model would work with variable-size inputs:
-# `Similarly, a trace is likely to be valid only for a specific input
-# size (which is one reason why we require explicit inputs on tracing)`
-# so... not sure what i should do
+EXPORT_PATH = "../models/ONNX/fakenews.onnx"
+# i guess someone has to pick a size... and pad everything up
+IN_SHAPE = None
+brev.onnx.exportfromfinnorsomething(model, EXPORT_PATH, IN_SHAPE)
