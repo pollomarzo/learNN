@@ -10,7 +10,7 @@ from torchtext import data
 from FakeNewsDataset import FakeNewsDataset
 from ex_QuantLeNet import QuantLeNet
 import torch.onnx
-import brevitas.torch.onnx as bo
+import brevonnx as bo
 
 ###############################################################################
 """
@@ -90,7 +90,7 @@ LABEL.build_vocab(train_data)
 # longest element of the batch.
 train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits(
     (train_data, valid_data, test_data),
-    batch_size=32,
+    batch_size=50000,
     device=device)
 vocab_size, embedding_dim = TEXT.vocab.vectors.shape
 
@@ -179,7 +179,7 @@ trainer.add_event_handler(Events.EPOCH_COMPLETED,
 
 trainer.run(train_iterator, max_epochs=5)
 
-EXPORT_PATH = "../models/ONNX/fakenews.onnx"
+EXPORT_PATH = '../models/ONNX/fakenews.onnx'
 # i guess someone has to pick a size... and pad everything up
-IN_SHAPE = None
-brev.onnx.exportfromfinnorsomething(model, EXPORT_PATH, IN_SHAPE)
+IN_SHAPE = train_iterator.data.shape
+bo.export_finn_onnx(model, IN_SHAPE, EXPORT_PATH)
