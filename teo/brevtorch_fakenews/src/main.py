@@ -64,7 +64,7 @@ def eval_function(engine, batch):
 
 
 CLEAN_DATA_FILE = '../clean_data/small.csv'
-
+SEQ_LENGTH = 3000
 device = torch.device('cpu')
 
 
@@ -72,7 +72,7 @@ SEED = 1234
 torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 
-TEXT = data.Field(lower=True, batch_first=True)
+TEXT = data.Field(lower=True, batch_first=True, fix_length=SEQ_LENGTH)
 LABEL = data.LabelField(dtype=torch.float)
 
 text_data = FakeNewsDataset(CLEAN_DATA_FILE, TEXT, LABEL)
@@ -90,7 +90,7 @@ LABEL.build_vocab(train_data)
 # longest element of the batch.
 train_iterator, valid_iterator, test_iterator = data.BucketIterator.splits(
     (train_data, valid_data, test_data),
-    batch_size=50000,
+    batch_size=32,
     device=device)
 vocab_size, embedding_dim = TEXT.vocab.vectors.shape
 
@@ -176,10 +176,14 @@ checkpointer = ModelCheckpoint(
 trainer.add_event_handler(Events.EPOCH_COMPLETED,
                           checkpointer, {'textcnn': model})
 """
-
-trainer.run(train_iterator, max_epochs=5)
-
+print('Starting training...')
+trainer.run(train_iterator, max_epochs=1)
+print('Done!')
+print('Exporting to ONNX...')
 EXPORT_PATH = '../models/ONNX/fakenews.onnx'
 # i guess someone has to pick a size... and pad everything up
-IN_SHAPE = train_iterator.data.shape
-bo.export_finn_onnx(model, IN_SHAPE, EXPORT_PATH)
+test_in = next(iter(train_iterator)).text
+IN_SHAPE = test_in.shape
+bo.export_finn_onnx(test_input=test_in, module=model,
+                    input_shape=IN_SHAPE, export_path=EXPORT_PATH)
+print('Completed! Closing...')

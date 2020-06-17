@@ -40,31 +40,6 @@ class QuantLeNet(Module):
                                   bias=True,
                                   weight_quant_type=QuantType.INT,
                                   weight_bit_width=8)
-        """
-        self.conv1 = qnn.QuantConv2d(3, 6, 5,
-                                     weight_quant_type=QuantType.INT,
-                                     weight_bit_width=8)
-        self.relu1 = qnn.QuantReLU(
-            quant_type=QuantType.INT, bit_width=8, max_val=6)
-        self.conv2 = qnn.QuantConv2d(6, 16, 5,
-                                     weight_quant_type=QuantType.INT,
-                                     weight_bit_width=8)
-        self.relu2 = qnn.QuantReLU(
-            quant_type=QuantType.INT, bit_width=8, max_val=6)
-        self.fc1 = qnn.QuantLinear(16*5*5, 120, bias=True,
-                                   weight_quant_type=QuantType.INT,
-                                   weight_bit_width=8)
-        self.relu3 = qnn.QuantReLU(
-            quant_type=QuantType.INT, bit_width=8, max_val=6)
-        self.fc2 = qnn.QuantLinear(120, 84, bias=True,
-                                   weight_quant_type=QuantType.INT,
-                                   weight_bit_width=8)
-        self.relu4 = qnn.QuantReLU(
-            quant_type=QuantType.INT, bit_width=8, max_val=6)
-        self.fc3 = qnn.QuantLinear(84, 10, bias=False,
-                                   weight_quant_type=QuantType.INT,
-                                   weight_bit_width=8)
-        """
 
     def forward(self, x):
         batch_size, sequence_length = x.shape
