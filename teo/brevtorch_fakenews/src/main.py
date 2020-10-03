@@ -11,6 +11,7 @@ from FakeNewsDataset import FakeNewsDataset
 from ex_QuantLeNet import QuantLeNet
 import torch.onnx
 import brevonnx as bo
+import io
 
 ###############################################################################
 """
@@ -181,9 +182,21 @@ trainer.run(train_iterator, max_epochs=1)
 print('Done!')
 print('Exporting to ONNX...')
 EXPORT_PATH = '../models/ONNX/fakenews.onnx'
-# i guess someone has to pick a size... and pad everything up
+
+
 test_in = next(iter(train_iterator)).text
 IN_SHAPE = test_in.shape
+
+traced = torch.jit.trace(model, test_in)
+buf = io.BytesIO()
+torch.jit.save(traced, buf)
+buf.seek(0)
+
+model = torch.jit.load(buf)
+f = io.BytesIO()
+
 bo.export_finn_onnx(test_input=test_in, module=model,
-                    input_shape=IN_SHAPE, export_path=EXPORT_PATH)
+                    input_shape=IN_SHAPE, export_path=f,
+                    operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK)
+f.seek(0)
 print('Completed! Closing...')

@@ -1,0 +1,89 @@
+Graph analysis of functional brain networks: practical issues in translational neuroscience
+
+1. Introduction
+- Interdisciplinary: need for common ground, on 
+    - terminology
+    - pipeline
+    - theory -> practice
+    - final neurophysiological explanation
+- novelty of this review: considers the entire pipeline, contains simple and practical indications, takes into account methodology
+
+2. Network vs graph
+Network: anatomical structure (axons and neurons)
+Graph: statistical dependence between areas, mathematical model
+
+3. Nodes
+general:
+a. voxel-based: nodes are found in MEASUREMENT space
+b. sensor-based: nodes == sensors, or nodes == reconstructed sources
+
+a. Single? Groups? how do you create them? most common: atlas (anatomical, fixed). Possible groups: independent components
+b. Nodes == sensors -> noise, coming from measurement itself and varying distances (sometimes helped by not normalizing). Fixes: spatial filters (laplacian techniques for removing shared noise), metter FC measures, cortical source reconstruction
+
+4. Functional links
+Functional neuroimaging -> links "are" similarity between signals. Otherwise, it is model-based
+FC methods categories: 
+    - Symmetric mutual interaction (undirected weighted links)
+    - Asymmetric information propagation (directed weighted links)
+
+    - can give either interaction (w_ij \in R+) or correlation (w_ik \in R) measures
+    - a specific theoretical principle is NEEDED
+    - higher time points -> more reliable info extracted. easy in resting-state, tougher in task-based (accomplished though repetition of experiment)
+    - nonlinear relationships require nonlinear algorithms
+    - STATIONARITY of measurement (mean, variance and other props) is almost always required. Again, easy in resting state, difficult in task-based -> sollutions: shorter time window, wavelet transformation, or applying FC methods that do not require stationarity.
+        -> why not regress global mean?
+        - Cons: 
+            - can introduce negative correlation
+            - sometimes mean is important: info loss
+        - Pros:
+            - increase specificity of link weights
+            - mitigate effects of head motion
+                head motion is a major cause of non-stationarity. Regression is one method to get rid of it (by applying a de-spiking step before motion regression, whatever the fuck that is [101]). The other is Deletion (remove the top points with excessive motion).
+
+5. Graph filtering
+Once you place weighted links in graph, you can keep all of them or only those above a threshold. 
+There are multiple ways to select a threshold, no point making a list. 
+Important info: select it based on dimension (nodes and time scale), especially if many nodes (as this implies many tests for threshold). To reduce test amount one can use network-based approach and divide in sub-networks before testing (although for this anatomical knowledge is needed).
+The number of links influences directly the topological metrics, so the threshold can be fixedd based on the amount of w_ij above zero. Because only some thresholds give non-random distributions, it is common to try multiple ones: then, to pick
+    a. difference at threshold
+    b. integrate over collection (?)
+    c. properties ACROSS the range of thresholds
+
+6. Topological metrics
+Can be calculated at (and have given clinical insight about):
+    a. entire graph (autism, schizo, stroke)
+    b. subgraphs (absent seizures, stroke)
+    c. single nodes (dementia, neurodegenerative diseases)
+So selecting the metric is based on the hypothesis tested. 
+Graph theory is mainly about binary graphs, and extending binary to weighted, especially considering negative values (for correlation-based) is not trivial.
+So, the easy solution is to filter and convert to binary.
+Also, link weight == similarity between signals != distance, which is (according to the authors) the intended purpose of link weight. whatever. 
+
+next section is in 7 i dont know why. i think they're a little disorganized
+
+7. Statistical analysis
+Topological metrics can be compared:
+    - against reference (how do I generate it? fully random? what do i keep (topologically speaking)?)
+    - between-group/between-condition (not always possible, obviously).
+BUT
+assuming topological metrics generated correctly, aka assuming proper brain graph indices, statistical manipulation is of three types:
+    a. hypothesis testing: considers the group differences
+        - requires Gaussianity: may be normalized (based on reference graphs)
+        - metrics may be correlated on the mathematical-definition-level: must account for it, either my measuring multicollinearity or by adjusting statistical significance accordingly (or with ML as stated later)
+    b. statistical modeling: relation with behavioural outcome
+    c. classification: using machine learning to separate groups (big advantage: can deal with both correlated and non-gaussian metrics)
+    
+8. Healthy and pathological brains
+Functional brain connectivity is altered by diseases. At the same time, many cause alterations wich affect the graph analysis, so their effects must be accounted for.
+ex:
+    - tumours, brain injury are accompanied by lesions
+        - structural segmentaion and normalization algorithms are affected
+            solutions:
+            - multiple images with different constrast values
+            - disease-specific segmentation (if you can get reference values... and how do you get anatomical atlas? you cant i guess)
+        - atrophy, same problems
+            "solutions":
+                - normalization method "with some freedom" (??)
+                - nonlinear method to warp data into different space (???)
+        - vascular component (alzheimer, dementia)
+            - that's it im done. sorry.
